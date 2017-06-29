@@ -36,10 +36,7 @@ class PushbulletShooter(object):
         )
 
         response = self.connection.getresponse()
-        status = response.getcode()
-        body = response.read().decode('utf-8')
-        print(body)
-        return status, json.loads(body)
+        return response.getcode() == 200
 
     def send_note(self, title, body):
         self.send({ 'type': 'note', 'title': title, 'body': body })
