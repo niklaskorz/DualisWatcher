@@ -22,6 +22,7 @@ class PushbulletShooter(object):
         )
 
         response = self.connection.getresponse()
+        response.read()
         return response.getcode() == 200
 
     def send(self, data):
@@ -36,6 +37,7 @@ class PushbulletShooter(object):
         )
 
         response = self.connection.getresponse()
+        response.read()
         return response.getcode() == 200
 
     def send_note(self, title, body):

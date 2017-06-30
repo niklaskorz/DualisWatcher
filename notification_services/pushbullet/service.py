@@ -1,7 +1,8 @@
 import logging
 import traceback
-from notification_services.notification_service import NotificationService
-from notification_services.pushbullet.pushbullet_shooter import PushbulletShooter
+from version_recorder import CollectionOfChanges
+from ..notification_service import NotificationService
+from .shooter import PushbulletShooter
 
 class PushbulletService(NotificationService):
     def interactively_configure(self):
