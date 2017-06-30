@@ -3,6 +3,7 @@ import traceback
 from version_recorder import CollectionOfChanges
 from ..notification_service import NotificationService
 from .shooter import PushbulletShooter
+from .formatter import create_full_dualis_diff, create_full_schedule_diff
 
 class PushbulletService(NotificationService):
     def interactively_configure(self):
@@ -39,7 +40,7 @@ class PushbulletService(NotificationService):
         try:
             logging.debug('Sending notification with pushbullet...')
             pushbullet_shooter = PushbulletShooter(pushbullet_cfg['access_token'])
-            pushbullet_shooter.send(title, body)
+            pushbullet_shooter.send_note(title, body)
             pushbullet_shooter.close()
         except:
             error_formatted = traceback.format_exc()
@@ -47,13 +48,12 @@ class PushbulletService(NotificationService):
             pass  # ignore the exception further up
     
     def notify_about_changes_in_results(self, changes: CollectionOfChanges, course_names: {str: str}, token: str):
-        mail_content = create_full_dualis_diff_mail(changes, course_names, token)
-        self._send_mail('%s neue Änderungen in den Modul-Ergebnissen!'%(changes.diff_count), mail_content)
+        content = create_full_dualis_diff(changes, course_names)
+        self._send_push('{} neue Änderungen in den Modulergebnissen!'.format(changes.diff_count), content)
 
     def notify_about_changes_in_schedule(self, changes: [str], uid: str):
-        mail_content = create_full_schedule_diff_mail(changes, uid)
-        self._send_mail('%s neue Änderungen im Vorlesungsplan!'%(len(changes)), mail_content)
+        content = create_full_schedule_diff(changes, uid)
+        self._send_push('{} neue Änderungen im Vorlesungsplan!'.format(len(changes)), content)
 
     def notify_about_error(self, error_description: str):
-        mail_content = create_full_error_mail(error_description)
-        self._send_mail('Fehler!', mail_content)
+        self._send_push('Dualis Watcher Fehler', error_description)

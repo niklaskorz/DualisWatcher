@@ -10,6 +10,7 @@ from config_helper import ConfigHelper
 from dhbw_ma_schedule_connector.schedule_service import ScheduleService
 from dualis_connector.dualis_service import DualisService
 from notification_services.mail.mail_service import MailService
+from notification_services.pushbullet import PushbulletService
 
 
 class ReRaiseOnError(logging.StreamHandler):
@@ -35,6 +36,7 @@ def run_init():
             sys.exit(0)
 
     MailService(config).interactively_configure()
+    PushbulletService(config).interactively_configure()
 
     dualis = DualisService(config)
     dualis.interactively_acquire_token()
@@ -110,6 +112,7 @@ def run_main():
         sys.exit(-1)
 
     mail_service = MailService(config)
+    pushbullet_service = PushbulletService(config)
 
     try:
         dualis = DualisService(config)
@@ -123,6 +126,7 @@ def run_main():
             logging.info('%s changes found for the configured Dualis-Account.'%(changes.diff_count))
             token = dualis.get_token()
             mail_service.notify_about_changes_in_results(changes, course_names, token)
+            pushbullet_service.notify_about_changes_in_results(changes, course_names, token)
             dualis.save_state()
         else:
             logging.info('No changes found for the configured Dualis-Account.')
@@ -134,6 +138,7 @@ def run_main():
             if len(changes) > 0:
                 logging.info('%s changes found for the configured Schedule.'%(len(changes)))
                 mail_service.notify_about_changes_in_schedule(changes, schedule.uid)
+                pushbullet_service.notify_about_changes_in_schedule(changes, schedule.uid)
                 schedule.save_state()
             else:
                 logging.info('No changes found for the configured Schedule.')
@@ -143,6 +148,7 @@ def run_main():
         error_formatted = traceback.format_exc()
         logging.error(error_formatted, extra={'exception':e})
         mail_service.notify_about_error(str(e))
+        pushbullet_service.notify_about_error(str(e))
         logging.debug('Exception-Handling completed. Exiting...', extra={'exception' : e})
         sys.exit(-1)
 
