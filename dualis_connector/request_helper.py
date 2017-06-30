@@ -73,7 +73,7 @@ class RequestHelper:
         if (response.getcode() != 200):
             raise RuntimeError('An Unexpected Error happened on side of the Dualis System!')
 
-        response_soup = BeautifulSoup(response.read(), 'html.parser')
+        response_soup = BeautifulSoup(response.read().decode('iso8859-1'), 'html.parser')
 
         if (    response_soup.title is not None  # because Dualis sometimes really doesn't care
                                                  #  about anything
